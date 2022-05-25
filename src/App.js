@@ -1,24 +1,39 @@
 import "./styles.css";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function App() {
   const cards = [1, 2, 3, 4, 1, 2, 3, 4];
+
   // todo: make a state that is an empty array by default
-  const empty = [];
+  const [matched, setMatched] = useState([]);
+  const [selection, setSelection] = useState([]);
 
-  // const [myState, setMyState] = useState('someValue');
-  // return (
-  //   <div>
-
-  //   </div>
-  // );
-  //would it be to check if they match got it, a seperate state
-
+  useEffect(
+    function () {
+      if (selection.length === 2) {
+        if (selection[0] === selection[1]) {
+          console.log("match!");
+          // notify user that its correct
+          // clear selection array
+          setMatched(function (matches) {
+            return [...matches, selection[0]];
+          });
+        }
+      }
+    },
+    [selection]
+  );
+  // if selection equals two of the cards in the array, then check the selection and print selection is changing in the console log
+  // a notification could work as well, whatever is easiest
   return (
     <div className="container">
       {cards.map(function (card) {
-        return <Card value={card} />;
+        return (
+          <Card value={card} setSelection={setSelection} matched={matched} />
+        );
       })}
+
+      {JSON.stringify(selection, null, 2)}
     </div>
   );
 }
@@ -27,19 +42,32 @@ export default function App() {
 function Card(props) {
   const [isFlipped, setIsFlipped] = useState(false);
 
+  const isMatched = props.matched.includes(props.value);
+
   function handleClick() {
-    setIsFlipped(true);
-    // push the value to do the new state
+    if (!isMatched) {
+      setIsFlipped(true);
+
+      props.setSelection(function (selection) {
+        return [...selection, props.value];
+      });
+    }
   }
 
   return (
-    <div className="card" onClick={handleClick}>
-      {isFlipped ? props.value : ""}
+    <div className={isMatched ? "card matched" : "card"} onClick={handleClick}>
+      {isFlipped || isMatched ? props.value : ""}
     </div>
+    // ...cards, props.value
   );
 }
-
+// first time for everything
 // someCondition ? value : otherValue
+// if (somCondition {
+//   value
+// } else {
+//   otherValue
+// })
 //
 // myArray.map(function(itemInArray) {
 //  return (
@@ -47,3 +75,7 @@ function Card(props) {
 //  )
 //})
 //
+
+// const [nameOfState, setNameOfState] = useState(defaultValue)
+
+// spread: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Spread_syntax
