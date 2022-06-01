@@ -2,7 +2,25 @@ import "./styles.css";
 import { useState, useEffect } from "react";
 
 export default function App() {
-  const cards = [1, 2, 3, 4, 1, 2, 3, 4];
+  // Car data.
+  const cards = [
+    { id: 1, value: "1" },
+    { id: 2, value: "2" },
+    { id: 3, value: "3" },
+    { id: 4, value: "4" },
+    { id: 5, value: "1" },
+    { id: 6, value: "2" },
+    { id: 7, value: "3" },
+    { id: 8, value: "4" },
+    { id: 9, value: "A" },
+    { id: 10, value: "B" },
+    { id: 11, value: "C" },
+    { id: 12, value: "D" },
+    { id: 13, value: "A" },
+    { id: 14, value: "B" },
+    { id: 15, value: "C" },
+    { id: 16, value: "D" }
+  ];
 
   // todo: make a state that is an empty array by default
   const [matched, setMatched] = useState([]);
@@ -11,14 +29,15 @@ export default function App() {
   useEffect(
     function () {
       if (selection.length === 2) {
-        if (selection[0] === selection[1]) {
+        if (selection[0].value === selection[1].value) {
           console.log("match!");
-          // notify user that its correct
-          // clear selection array
-          setMatched(function (matches) {
-            return [...matches, selection[0]];
-          });
+
+          // Add the matched selection into the matched array
+          setMatched([...matched, selection[0].value]);
         }
+
+        // clear selection array
+        setSelection([]);
       }
     },
     [selection]
@@ -29,34 +48,38 @@ export default function App() {
     <div className="container">
       {cards.map(function (card) {
         return (
-          <Card value={card} setSelection={setSelection} matched={matched} />
+          <Card
+            data={card}
+            selection={selection}
+            setSelection={setSelection}
+            matched={matched}
+          />
         );
       })}
 
-      {JSON.stringify(selection, null, 2)}
+      {/* {JSON.stringify(selection, null, 2)}
+      {JSON.stringify(matched, null, 2)} */}
     </div>
   );
 }
 
 // pass your new state set function into the cards via props
 function Card(props) {
-  const [isFlipped, setIsFlipped] = useState(false);
+  const isMatched = props.matched.includes(props.data.value);
 
-  const isMatched = props.matched.includes(props.value);
+  const isInSelection = props.selection.find((e) => e.id === props.data.id);
 
   function handleClick() {
     if (!isMatched) {
-      setIsFlipped(true);
-
-      props.setSelection(function (selection) {
-        return [...selection, props.value];
-      });
+      if (!props.selection.find((e) => e.id === props.data.id)) {
+        props.setSelection([...props.selection, props.data]);
+      }
     }
   }
 
   return (
     <div className={isMatched ? "card matched" : "card"} onClick={handleClick}>
-      {isFlipped || isMatched ? props.value : ""}
+      {isInSelection || isMatched ? props.data.value : ""}
     </div>
     // ...cards, props.value
   );
